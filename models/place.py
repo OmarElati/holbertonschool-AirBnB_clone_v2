@@ -4,10 +4,9 @@ from models.base_model import BaseModel, Base
 from sqlalchemy import Column, String, Integer, Float, Table, ForeignKey
 from sqlalchemy.orm import relationship
 import models
-from models import *
 from models.amenity import Amenity
-
-
+import os
+from models import *
 
 # Define the place_amenity table
 place_amenity = Table('place_amenity', Base.metadata,
@@ -18,26 +17,11 @@ place_amenity = Table('place_amenity', Base.metadata,
 
 
 # Define the Place table
-class Place(Base):
-    __tablename__ = 'places'
-    id = Column(String(60), primary_key=True, nullable=False)
-    name = Column(String(128), nullable=False)
-    amenities = relationship("Amenity", secondary=place_amenity, viewonly=False)
-
-
-# Define the Amenity table
-class Amenity(Base):
-    __tablename__ = 'amenities'
-    id = Column(String(60), primary_key=True, nullable=False)
-    name = Column(String(128), nullable=False)
-storage_type = "string"
-
-
 class Place(BaseModel, Base):
     """ A place to stay """
     __tablename__ = "places"
 
-    if storage_type == 'db':
+    if os.getenv('HBNB_TYPE_STORAGE') == 'db':
         amenities = relationship("Amenity", secondary=place_amenity, viewonly=False)
     else:
         @property
@@ -55,6 +39,7 @@ class Place(BaseModel, Base):
                 if obj.id not in self.amenity_ids:
                     self.amenity_ids.append(obj.id)
 
+    id = Column(String(60), primary_key=True, nullable=False)
     city_id = Column(String(60), ForeignKey("cities.id"), nullable=False)
     user_id = Column(String(60), ForeignKey("users.id"), nullable=False)
     name = Column(String(128), nullable=False)
