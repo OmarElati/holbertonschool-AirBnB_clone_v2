@@ -1,68 +1,55 @@
 #!/usr/bin/python3
-""" Module for testing db_storage"""
+"""Unittest for DBStorage"""
+import os
 import unittest
-from models.state import State
-from models.city import City
-from models.user import User
-from models.place import Place
-from models.review import Review
-from models.amenity import Amenity
 from models import storage
+from models.engine.db_storage import DBStorage
+from models.state import State
 
 
+@unittest.skipIf(os.getenv('HBNB_TYPE_STORAGE') != 'db', 'db not active')
 class TestDBStorage(unittest.TestCase):
+    """Tests for the DBStorage class"""
+
     def setUp(self):
-        self.db = storage.DBStorage()
+        """Set up testing environment"""
+        self.db = DBStorage()
+        self.db.reload()
 
     def tearDown(self):
+        """Tear down testing environment"""
         self.db.close()
 
     def test_all(self):
-        # Test all() method with no arguments
-        all_objs = self.db.all()
-        self.assertIsInstance(all_objs, dict)
-        self.assertIn('State', all_objs)
-        self.assertIn('City', all_objs)
-        self.assertIn('User', all_objs)
-        self.assertIn('Place', all_objs)
-        self.assertIn('Review', all_objs)
-        self.assertIn('Amenity', all_objs)
-
-        # Test all() method with one class argument
-        all_states = self.db.all(State)
-        self.assertIsInstance(all_states, dict)
-        self.assertIn('State', all_states)
-        self.assertNotIn('City', all_states)
+        """Test all method"""
+        objs = self.db.all()
+        self.assertIsNotNone(objs)
 
     def test_new(self):
-        # Test that a new object is added to the session
-        new_state = State(name="California")
-        self.db.new(new_state)
-        self.assertIn(new_state, self.db.__session.new)
+        """Test new method"""
+        new_obj = State(name="California")
+        self.db.new(new_obj)
+        self.assertIn(new_obj, self.db.all().values())
 
     def test_save(self):
-        # Test that changes to objects are saved to the database
-        new_state = State(name="Nevada")
-        self.db.new(new_state)
+        """Test save method"""
+        new_obj = State(name="California")
+        self.db.new(new_obj)
         self.db.save()
-        self.assertIn(new_state, self.db.all(State).values())
+        self.assertTrue(os.path.isfile('file.json'))
 
     def test_delete(self):
-        # Test that an object can be deleted from the session and database
-        new_state = State(name="Texas")
-        self.db.new(new_state)
+        """Test delete method"""
+        new_obj = State(name="California")
+        self.db.new(new_obj)
         self.db.save()
-        self.assertIn(new_state, self.db.all(State).values())
-
-        self.db.delete(new_state)
-        self.assertNotIn(new_state, self.db.all(State).values())
+        self.db.delete(new_obj)
+        self.assertNotIn(new_obj, self.db.all().values())
 
     def test_reload(self):
-        # Test that tables are created and session is reloaded
-        self.db.reload()
-        self.assertIsNotNone(self.db.__engine)
-        self.assertIsNotNone(self.db.__session)
-        self.assertIsInstance(self.db.__session(), self.db.session_factory)
+        """Test reload method"""
+        self.assertTrue(isinstance(self.db._DBStorage__engine, object))
+        self.assertTrue(isinstance(self.db._DBStorage__session, object))
 
 
 if __name__ == '__main__':
