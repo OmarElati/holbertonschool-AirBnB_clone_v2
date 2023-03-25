@@ -19,11 +19,11 @@ class HBNBCommand(cmd.Cmd):
     # determines prompt for interactive/non-interactive modes
     prompt = '(hbnb) ' if sys.__stdin__.isatty() else ''
 
-    classes = {
+    all_classes = {
                'BaseModel': BaseModel, 'User': User, 'Place': Place,
                'State': State, 'City': City, 'Amenity': Amenity,
                'Review': Review
-              }
+            }
     dot_cmds = ['all', 'count', 'show', 'destroy', 'update']
     types = {
              'number_rooms': int, 'number_bathrooms': int,
@@ -226,25 +226,19 @@ class HBNBCommand(cmd.Cmd):
         """
         Prints all string representation of all instances based or not on the class name.
         """
-        my_list = []
+        rgs = arg.split()
+        objects = []
         if not arg:
-            objects = storage.all()
-            for key in objects.keys():
-                my_list.append(objects[key])
-            print(my_list)
+            for obj in self.storage.all().values():
+                objects.append(str(obj))
+            print(objects)
             return
-        try:
-            args = arg.split(" ")
-            if args[0] not in self.all_classes:
-                raise NameError()
-            objects = storage.all()
-            for key in objects:
-                name = key.split('.')
-                if name[0] == args[0]:
-                    my_list.append(objects[key])
-            print(my_list)
-        except NameError:
+        if arg[0] not in self.all_classes:
             print("** class doesn't exist **")
+            return
+        for obj in self.storage.all(self.all_classes[arg[0]]).values():
+            objects.append(str(obj))
+        print(objects)
 
     def help_all(self):
         """ Help information for the all command """
