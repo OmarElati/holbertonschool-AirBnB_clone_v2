@@ -48,7 +48,8 @@ class DBStorage:
         if cls is not None:
             if cls in self.classes:
                 objs = self.__session.query(self.classes[cls]).all()
-                return {obj.__class__.__name__ + '.' + obj.id: obj for obj in objs}
+                return {obj.__class__.__name__ + '.' + obj.
+                        id: obj for obj in objs}
             else:
                 return {}
         else:
@@ -82,7 +83,8 @@ class DBStorage:
 
     def reload(self):
         """
-        Create all tables in the database and create the current database session.
+        Create all tables in the database and
+        create the current database session.
         """
         Base.metadata.create_all(self.__engine)
         session_factory = sessionmaker(bind=self.__engine,
