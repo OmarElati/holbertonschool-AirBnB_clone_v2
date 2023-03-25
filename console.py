@@ -2,7 +2,7 @@
 """ Console Module """
 import cmd
 import sys
-import models
+from models import *
 from models.base_model import BaseModel
 from models.__init__ import storage
 from models.user import User
@@ -17,18 +17,12 @@ class HBNBCommand(cmd.Cmd):
     """ Contains the functionality for the HBNB console"""
 
     # determines prompt for interactive/non-interactive modes
-    prompt = '(hbnb) ' if sys.__stdin__.isatty() else ''
+    prompt = '(hbnb) '
 
     all_classes = {
-               'BaseModel': BaseModel, 'User': User, 'Place': Place,
-               'State': State, 'City': City, 'Amenity': Amenity,
-               'Review': Review
-            }
-    dot_cmds = ['all', 'count', 'show', 'destroy', 'update']
-    types = {
-             'number_rooms': int, 'number_bathrooms': int,
-             'max_guest': int, 'price_by_night': int,
-             'latitude': float, 'longitude': float
+               "BaseModel": BaseModel, "User": User, "Place": Place,
+               "State": State, "City": City, "Amenity": Amenity,
+               "Review": Review
             }
 
     def preloop(self):
