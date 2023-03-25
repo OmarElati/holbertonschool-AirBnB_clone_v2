@@ -5,7 +5,7 @@ This module defines the DBStorage class
 import os
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, scoped_session
-from models.base_model import Base
+from models.base_model import BaseModel, Base
 from models.amenity import Amenity
 from models.city import City
 from models.place import Place
@@ -67,7 +67,8 @@ class DBStorage:
         """
         Add the object to the current database session.
         """
-        self.__session.add(obj)
+        if obj:
+            self.__session.add(obj)
 
     def save(self):
         """
@@ -81,6 +82,7 @@ class DBStorage:
         """
         if obj:
             self.__session.delete(obj)
+        self.save()
 
     def reload(self):
         """
