@@ -19,7 +19,7 @@ class HBNBCommand(cmd.Cmd):
     # determines prompt for interactive/non-interactive modes
     prompt = '(hbnb) ' if sys.__stdin__.isatty() else ''
 
-    classes = {
+    all_classes = {
                "BaseModel": BaseModel, "User": User, "Place": Place,
                "State": State, "City": City, "Amenity": Amenity,
                "Review": Review
@@ -233,7 +233,7 @@ class HBNBCommand(cmd.Cmd):
             for value in storage.all().values():
                 instances_list.append(str(value))
             print(instances_list)
-        elif args[0] not in self.classes:
+        elif args[0] not in self.all_classes:
             print("** class doesn't exist **")
         else:
             for key, value in storage.all().items():
