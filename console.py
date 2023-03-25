@@ -17,12 +17,18 @@ class HBNBCommand(cmd.Cmd):
     """ Contains the functionality for the HBNB console"""
 
     # determines prompt for interactive/non-interactive modes
-    prompt = '(hbnb) '
+    prompt = '(hbnb) ' if sys.__stdin__.isatty() else ''
 
     all_classes = {
                "BaseModel": BaseModel, "User": User, "Place": Place,
                "State": State, "City": City, "Amenity": Amenity,
                "Review": Review
+            }
+    dot_cmds = ['all', 'count', 'show', 'destroy', 'update']
+    types = {
+             'number_rooms': int, 'number_bathrooms': int,
+             'max_guest': int, 'price_by_night': int,
+             'latitude': float, 'longitude': float
             }
 
     def preloop(self):
@@ -220,17 +226,17 @@ class HBNBCommand(cmd.Cmd):
         """
         Prints all string representation of all instances based or not on the class name.
         """
-        rgs = arg.split()
+        args = arg.split()
         objects = []
-        if not arg:
+        if not args:
             for obj in self.storage.all().values():
                 objects.append(str(obj))
             print(objects)
             return
-        if arg[0] not in self.all_classes:
+        if args[0] not in self.all_classes:
             print("** class doesn't exist **")
             return
-        for obj in self.storage.all(self.all_classes[arg[0]]).values():
+        for obj in self.storage.all(self.all_classes[args[0]]).values():
             objects.append(str(obj))
         print(objects)
 
