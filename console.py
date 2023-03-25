@@ -224,21 +224,22 @@ class HBNBCommand(cmd.Cmd):
 
     def do_all(self, arg):
         """
-        Prints all string representation of all instances based or not on the class name.
+        Prints all string representation of all instances based or not on
+        the class name.
         """
         args = arg.split()
-        objects = []
-        if not args:
-            for obj in self.storage.all().values():
-                objects.append(str(obj))
-            print(objects)
-            return
-        if args[0] not in self.all_classes:
+        instances_list = []
+        if not arg:
+            for value in storage.all().values():
+                instances_list.append(str(value))
+            print(instances_list)
+        elif args[0] not in self.classes:
             print("** class doesn't exist **")
-            return
-        for obj in self.storage.all(self.all_classes[args[0]]).values():
-            objects.append(str(obj))
-        print(objects)
+        else:
+            for key, value in storage.all().items():
+                if args[0] in key:
+                    instances_list.append(str(value))
+            print(instances_list)
 
     def help_all(self):
         """ Help information for the all command """
@@ -346,5 +347,5 @@ class HBNBCommand(cmd.Cmd):
         print("Usage: update <className> <id> <attName> <attVal>\n")
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     HBNBCommand().cmdloop()
