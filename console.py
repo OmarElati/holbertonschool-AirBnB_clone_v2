@@ -226,12 +226,25 @@ class HBNBCommand(cmd.Cmd):
         """
         Prints all string representation of all instances based or not on the class name.
         """
-        args = arg.split()
-        if not args or args[0] not in models.classes:
-            objects = models.storage.all()
-        else:
-            objects = models.storage.all(models.classes[args[0]])
-        print([str(obj) for obj in objects.values()])
+        my_list = []
+        if not arg:
+            objects = storage.all()
+            for key in objects.keys():
+                my_list.append(objects[key])
+            print(my_list)
+            return
+        try:
+            args = arg.split(" ")
+            if args[0] not in self.all_classes:
+                raise NameError()
+            objects = storage.all()
+            for key in objects:
+                name = key.split('.')
+                if name[0] == args[0]:
+                    my_list.append(objects[key])
+            print(my_list)
+        except NameError:
+            print("** class doesn't exist **")
 
     def help_all(self):
         """ Help information for the all command """
