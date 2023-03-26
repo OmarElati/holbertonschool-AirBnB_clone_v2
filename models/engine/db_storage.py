@@ -46,52 +46,57 @@ class DBStorage:
         """
         Returns a dictionary of instances/objects.
         """
-        my_dict = {}
-        if cls in self.__classes:
-            result = DBStorage.__session.query(cls)
-            for row in result:
-                key = "{}.{}".format(row.__class__.__name__, row.id)
-                my_dict[key] = row
-        elif cls is None:
-            for cl in self.__classes:
-                result = DBStorage.__session.query(cl)
-                for row in result:
-                    key = "{}.{}".format(row.__class__.__name__, row.id)
-                    my_dict[key] = row
-        return my_dict
+        from models import classes
+        objects = {}
+        if cls:
+            if type(cls) == str:
+                cls = classes[cls]
+            query = self.__session.query(cls).all()
+            for obj in query:
+                key = '{}.{}'.format(obj.__class__.__name__, obj.id)
+                objects[key] = obj
+        else:
+            for cls in classes.values():
+                query = self.__session.query(cls).all()
+                for obj in query:
+                    key = '{}.{}'.format(obj.__class__.__name__, obj.id)
+                    objects[key] = obj
+        return objects
 
     def new(self, obj):
         """
         Add the object to the current database session.
         """
-        DBStorage.__session.add(obj)
+        if obj:
+            self.__session.add(obj)
 
     def save(self):
         """
         Commit all changes of the current database session.
         """
-        DBStorage.__session.commit()
+        self.__session.commit()
 
     def delete(self, obj=None):
         """
         Delete obj from the current database session.
         """
-        DBStorage.__session.delete(obj)
+        if obj:
+            self.__session.delete(obj)
+        self.save()
 
     def reload(self):
         """
         Create all tables in the database and
         create the current database session.
         """
-        """Method to create the current database session"""
         Base.metadata.create_all(self.__engine)
         session_factory = sessionmaker(bind=self.__engine,
                                        expire_on_commit=False)
         Session = scoped_session(session_factory)
-        DBStorage.__session = Session()
+        self.__session = Session()
 
     def close(self):
         """
         Close the current database session.
         """
-        DBStorage.__session.close()
+        self.__session.close()

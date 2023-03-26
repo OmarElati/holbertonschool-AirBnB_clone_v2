@@ -130,7 +130,7 @@ class HBNBCommand(cmd.Cmd):
                 k, v = param.split('=')
                 try:
                     attribute = HBNBCommand.verify_attribute(v)
-                except:
+                except ValueError:
                     continue
                 if not attribute:
                     continue
@@ -141,6 +141,8 @@ class HBNBCommand(cmd.Cmd):
             print("** class name missing **")
         except NameError as e:
             print("** class doesn't exist **")
+        except Exception as e:
+            print("{}".format(str(e)))
 
     def help_create(self):
         """ Help information for the create method """
