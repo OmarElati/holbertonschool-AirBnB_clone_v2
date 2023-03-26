@@ -24,6 +24,7 @@ place_amenity = Table(
         nullable=False)
 )
 
+
 class Amenity(BaseModel, Base):
     """ Amenity class """
     __tablename__ = 'amenities'
