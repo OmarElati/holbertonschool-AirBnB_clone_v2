@@ -114,35 +114,42 @@ class HBNBCommand(cmd.Cmd):
         """ Overrides the emptyline method of CMD """
         pass
 
-    def do_create(self, args):
+    def do_create(self, arg):
         """Creates a new instance of BaseModel, saves it
         Exceptions:
             SyntaxError: when there is no args given
             NameError: when there is no object that has the name
         """
         try:
-            if not args:
+            if not arg:
                 raise SyntaxError()
-            split1 = args.split(' ')
-            new_instance = eval('{}()'.format(split1[0]))
-            params = split1[1:]
-            for param in params:
-                k, v = param.split('=')
-                try:
-                    attribute = HBNBCommand.verify_attribute(v)
-                except ValueError:
-                    continue
-                if not attribute:
-                    continue
-                setattr(new_instance, k, attribute)
-            new_instance.save()
-            print(new_instance.id)
+            my_list = arg.split(" ")
+            obj = eval("{}()".format(my_list[0]))
+            if len(my_list) > 1:
+                for param in my_list[1:]:
+                    kv_pair = param.split('=')
+                    if kv_pair[0] and kv_pair[1]:
+                        if kv_pair[1][0] == '"' and kv_pair[1][-1] == '"':
+                            kv_pair[1] = kv_pair[1][1:-1]
+                            kv_pair[1] = kv_pair[1].replace('_', ' ')
+                            setattr(obj, kv_pair[0], kv_pair[1])
+                            continue
+                        try:
+                            if kv_pair[1].replace('-', '', 1).isdigit():
+                                kv_pair[1] = int(kv_pair[1])
+                                setattr(obj, kv_pair[0], kv_pair[1])
+                            elif kv_pair[1].replace('.', '', 1)\
+                                        .replace('-', '', 1).isdigit():
+                                kv_pair[1] = float(kv_pair[1])
+                                setattr(obj, kv_pair[0], kv_pair[1])
+                        except:
+                            pass
+            obj.save()
+            print("{}".format(obj.id))
         except SyntaxError:
             print("** class name missing **")
-        except NameError as e:
+        except NameError:
             print("** class doesn't exist **")
-        except Exception as e:
-            print("{}".format(str(e)))
 
     def help_create(self):
         """ Help information for the create method """
@@ -220,20 +227,19 @@ class HBNBCommand(cmd.Cmd):
         Prints all string representation of all instances based or not on
         the class name.
         """
-        obj = storage.all()
-        print_list = []
-        if args:
-            args = args.split(' ')[0]  # remove possible trailing args
-            if args not in HBNBCommand.classes:
-                print("** class doesn't exist **")
-                return
-            for key, value in obj.items():
-                if key.split('.')[0] == args:
-                    print_list.append(str(value))
+        args = arg.split()
+        instances_list = []
+        if not arg:
+            for value in storage.all().values():
+                instances_list.append(str(value))
+            print(instances_list)
+        elif args[0] not in self.classes:
+            print("** class doesn't exist **")
         else:
-            for key, value in obj.items():
-                print_list.append(str(value))
-        print(print_list)
+            for key, value in storage.all().items():
+                if args[0] in key:
+                    instances_list.append(str(value))
+            print(instances_list)
 
     def help_all(self):
         """ Help information for the all command """
@@ -339,22 +345,6 @@ class HBNBCommand(cmd.Cmd):
         """ Help information for the update class """
         print("Updates an object with new information")
         print("Usage: update <className> <id> <attName> <attVal>\n")
-
-    @classmethod
-    def verify_attribute(cls, attribute):
-        """
-        Verify if the attribute is correctly formatted
-        """
-        if attribute[0] is attribute[-1] in ['"', "'"]:
-            return attribute.strip('"\'').replace('_', ' ').replace('\\', '"')
-        else:
-            try:
-                try:
-                    return int(attribute)
-                except ValueError:
-                    return float(attribute)
-            except ValueError:
-                return None
 
 
 if __name__ == '__main__':
