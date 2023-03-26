@@ -7,9 +7,10 @@ from sqlalchemy.orm import relationship
 
 class City(BaseModel, Base):
     """City class for storing state data"""
+
     __tablename__ = "cities"
 
-    places = relationship("Place", cascade="all, \
-                          delete-orphan", backref="city")
+    places = relationship("Place", cascade="all, delete-orphan", backref="city")
+
     name = Column(String(128), nullable=False)
     state_id = Column(String(60), ForeignKey('states.id'), nullable=False)

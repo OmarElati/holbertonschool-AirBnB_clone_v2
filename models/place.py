@@ -1,13 +1,27 @@
 #!/usr/bin/python3
 """This is the place class"""
 from models.base_model import BaseModel, Base
-from models.review import Review
-from models.amenity import Amenity
 import models
 from sqlalchemy import Column, Integer, Float, String, ForeignKey, Table
 from sqlalchemy.orm import relationship
 import os
-from models.amenity import place_amenity
+
+
+place_amenity = Table(
+    "place_amenity",
+    Base.metadata,
+    Column(
+        "place_id",
+        String(60),
+        ForeignKey("places.id"),
+        primary_key=True,
+        nullable=False),
+    Column(
+        "amenity_id",
+        String(60),
+        ForeignKey("amenities.id"),
+        primary_key=True,
+        nullable=False))
 
 
 class Place(BaseModel, Base):
@@ -63,7 +77,7 @@ class Place(BaseModel, Base):
     longitude = Column(
         Float,
         nullable=True)
-
+    amenity_ids = []
     if os.getenv('HBNB_TYPE_STORAGE') == 'db':
         reviews = relationship(
             "Review",
@@ -74,27 +88,23 @@ class Place(BaseModel, Base):
             secondary=place_amenity,
             viewonly=False)
     else:
-        def __init__(self, *args, **kwargs):
-            super().__init__(*args, **kwargs)
-            self.amenity_ids = []
-
         @property
         def reviews(self):
-            item_list = []
+            l = []
             for id, rvw in models.storage.all(Review).items():
                 if rvw.place.id == Review.id:
-                    item_list.append(rvw)
-            return item_list
+                    l.append(rvw)
+            return l
 
         @property
         def amenities(self):
-            amenities_list = []
-            for amenity in self.amenity_ids:
-                if amenity.id == self.id:
-                    amenities_list.append(amenity)
-            return amenities_list
+            los_angeles = []
+            for angel in amenity_ids:
+                if angel.id == self.id:
+                    amenities_list.append(angel)
+            return los_angeles
 
         @amenities.setter
-        def amenities(self, amenity):
-            if isinstance(amenity, Amenity):
-                self.amenity_ids.append(amenity)
+        def amenities(self, angel):
+            if type(angel) is Amenity:
+                self.amenity_ids.append(angel)
