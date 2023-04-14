@@ -11,7 +11,7 @@ app = Flask(__name__)
 def states():
     """Displays an HTML page that lists all State objects present in DBStorage sorted by name"""
     states = sorted(storage.all(State).values(), key=lambda x: x.name)
-    return render_template('7-states_list.html', states=states)
+    return render_template('9-states.html', states=states)
 
 
 @app.route('/states/<id>', strict_slashes=False)
