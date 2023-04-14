@@ -19,9 +19,9 @@ def state_cities(id):
     """Displays an HTML page that lists all City objects linked to the State with the given id"""
     state = storage.get(State, id)
     if state is None:
-        return render_template('9-not_found.html')
+        return render_template('9-states.html')
     cities = sorted(state.cities, key=lambda x: x.name)
-    return render_template('8-cities_by_states.html', state=state, cities=cities)
+    return render_template('9-states.html', state=state, cities=cities)
 
 
 @app.teardown_appcontext
