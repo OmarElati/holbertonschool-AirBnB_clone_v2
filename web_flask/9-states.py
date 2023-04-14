@@ -7,11 +7,24 @@ from models.state import State
 app = Flask(__name__)
 
 
+@app.route('/cities_by_states', strict_slashes=False)
+def cities_by_states():
+    """Displays an HTML page with a list of States and Cities"""
+    states = storage.all(State).values()
+    cities = list()
+    for state in states:
+        for city in state.cities:
+            cities.append(city)
+
+    return render_template('8-cities_by_states.html',
+                           states=states, state_cities=cities)
+
+
 @app.route('/states', strict_slashes=False)
 def states():
     """Displays an HTML page that lists all State objects present in DBStorage sorted by name"""
     states = storage.all(State).values()
-    return render_template('9-states.html', states=states)
+    return render_template('7-states_list.html', states=states)
 
 
 @app.route('/states/<id>', strict_slashes=False)
